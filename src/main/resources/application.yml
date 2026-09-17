@@ -1,0 +1,45 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: USERSERVICE
+              uri: lb://USERSERVICE
+              predicates:
+                - Path=/users/**
+
+            - id: HOTELSERVICE
+              uri: lb://HOTELSERVICE
+              predicates:
+                - Path=/hotels/**,/staffs/**
+
+            - id: RATINGSERVICE
+              uri: lb://RATINGSERVICE
+              predicates:
+                - Path=/ratings/**
+
+            - id: JWTSERVICE
+              # The live Eureka registration name is JWTSERVICE.
+              uri: lb://JWTSERVICE
+              predicates:
+                - Path=/auth/**
+
+app:
+  security:
+    # Service id resolved through Eureka by the authentication filter.
+    jwt-service-id: JWTSERVICE
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8083/eureka/
